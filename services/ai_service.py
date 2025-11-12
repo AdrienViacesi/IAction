@@ -6,6 +6,8 @@ from typing import Dict, Any, List
 from openai import OpenAI
 import logging
 from urllib.parse import urlparse, urlunparse
+from PIL import Image
+from io import BytesIO
 
 logger = logging.getLogger(__name__)
 
@@ -235,6 +237,7 @@ class AIService:
         """Analyse une image avec OpenAI ou LM Studio en utilisant l'API compatible OpenAI"""
         try:
             # Préparer l'image pour l'API vision
+            image_base64 = self._resize_image_base64(image_base64)
             image_content = f"data:image/jpeg;base64,{image_base64}"
             
             api_name = self._get_api_name()
@@ -420,3 +423,20 @@ Rules:
                 'success': False,
                 'error': f'Impossible de se connecter à {api_name}: {str(e)}'
             }
+    
+    def _resize_image_base64(self, base64_str: str, max_size: int = 896) -> str:
+        """Redimensionne une image encodée en base64 si elle dépasse la taille max"""
+        try:
+            image_data = base64.b64decode(base64_str)
+            image = Image.open(BytesIO(image_data))
+
+            if image.width > max_size or image.height > max_size:
+                image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+                buffer = BytesIO()
+                image.save(buffer, format="JPEG")
+                resized_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                return resized_base64
+            return base64_str
+        except Exception as e:
+            logger.warning(f"Impossible de redimensionner l'image: {e}")
+            return base64_str
