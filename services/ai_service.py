@@ -424,7 +424,7 @@ Rules:
                 'error': f'Impossible de se connecter à {api_name}: {str(e)}'
             }
     
-    def _resize_image_base64(self, base64_str: str, max_size: int = 896) -> str:
+    def _resize_image_base64(self, base64_str: str, max_size: int = 512) -> str:
         """Redimensionne une image encodée en base64 si elle dépasse la taille max"""
         try:
             image_data = base64.b64decode(base64_str)
