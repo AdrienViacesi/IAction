@@ -23,7 +23,7 @@ class CameraService:
         self.frame_lock = threading.Lock()
         self.cameras_cache = None
         self.cache_time = 0
-        self.cache_duration = 30  # Cache pendant 30 secondes
+        self.cache_duration = 0  # Cache pendant 30 secondes
         self.last_frame_ts = 0.0
         self.reconnect_attempts = 0
         self.next_reconnect_time = 0.0
